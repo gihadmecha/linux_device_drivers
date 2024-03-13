@@ -1,0 +1,1 @@
+savedcmd_/home/gihad/github/linux_device_drivers/Hello/Module.symvers :=  scripts/mod/modpost -m -a      -o /home/gihad/github/linux_device_drivers/Hello/Module.symvers -T /home/gihad/github/linux_device_drivers/Hello/modules.order -i Module.symvers -e 

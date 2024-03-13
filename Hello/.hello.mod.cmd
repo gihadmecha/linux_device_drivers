@@ -1,0 +1,1 @@
+savedcmd_/home/gihad/github/linux_device_drivers/Hello/hello.mod := printf '%s\n'   hello.o | awk '!x[$$0]++ { print("/home/gihad/github/linux_device_drivers/Hello/"$$0) }' > /home/gihad/github/linux_device_drivers/Hello/hello.mod

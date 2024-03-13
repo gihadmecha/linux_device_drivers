@@ -1,0 +1,1 @@
+savedcmd_/home/gihad/github/linux_device_drivers/Hello/modules.order := {   echo /home/gihad/github/linux_device_drivers/Hello/hello.o; :; } > /home/gihad/github/linux_device_drivers/Hello/modules.order
