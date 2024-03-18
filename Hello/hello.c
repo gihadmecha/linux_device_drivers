@@ -1,6 +1,7 @@
 
+//for alloc_chrdev_region function, unregister_chrdev_region function, Major macro and Minor macro
 #include <linux/fs.h>
-#include <linux/cdev.h>
+//#include <linux/cdev.h>
 
 #include <linux/module.h>
 #include <linux/init.h>
@@ -10,6 +11,7 @@
 
 //create device driver Number automatically
 //-----------------------------------------------------------------------
+//variable to set Major and Minor numbers in it.
 dev_t device_number;
 //-----------------------------------------------------------------------
 
@@ -52,7 +54,7 @@ static int __init driver_hello_init (void)
     retval = alloc_chrdev_region ( &device_number, 0, 1, "Gihad_SUDO_DRIVER");
     if (retval == 0)
     {
-        //print the function name.
+        //print the function name "driver_hello_init".
 
         //print the Major Number from "device number" variable.
         //print the Minor Number from the least 20 bits in the "device number" variable.
@@ -75,7 +77,7 @@ static int __init driver_hello_init (void)
 
     for (i = 0; i < cnt; i++)
         printk ("Hello kernel !!\n");
-        
+
     return 0;
 }
 
