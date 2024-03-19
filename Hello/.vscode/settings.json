@@ -2,6 +2,7 @@
     "files.associations": {
         "module.h": "c",
         "moduleparam.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "cdev.h": "c"
     }
 }

@@ -1,7 +1,9 @@
 
 //for alloc_chrdev_region function, unregister_chrdev_region function, Major macro and Minor macro
 #include <linux/fs.h>
-//#include <linux/cdev.h>
+
+//define driver as character, block or network
+#include <linux/cdev.h>
 
 #include <linux/module.h>
 #include <linux/init.h>
@@ -14,6 +16,30 @@
 //variable to set Major and Minor numbers in it.
 dev_t device_number;
 //-----------------------------------------------------------------------
+
+static int driver_open (struct inode* device_file, struct file* instance)
+{
+    printk ("device file was opened !!");
+    return 0;
+}
+
+static int driver_close (struct inode* device_file, struct file* instance)
+{
+    printk ("device file was closed !!");
+    return 0;
+}
+
+struct file_operations file_operations =
+{
+    //this file operation struct for this module
+    .owner = THIS_MODULE,
+
+    .open = driver_open,
+    .release = driver_close
+};
+
+//add it as character device
+struct cdev strut_characterDevice;
 
 //module informations
 //-----------------------------------------------------------------------
@@ -47,7 +73,7 @@ static int __init driver_hello_init (void)
     int i = 0;
     int retval;
 
-    ///create device driver Number automatically
+    //1-create device driver numbers automatically
     //-----------------------------------------------------------------------
     //set the Minor number you choose in the least 20 bits in the "device number" variable
     //set the Major number you choose in the rest bits in the "device number" variable
@@ -74,6 +100,20 @@ static int __init driver_hello_init (void)
         return -1;
     }
     //-----------------------------------------------------------------------
+
+    //2-define driver as character, block or network
+    //-----------------------------------------------------------------------
+    //add it as character device
+    cdev_init(&strut_characterDevice, &file_operations);
+    retval = cdev_add (&strut_characterDevice, device_number, 1);
+    if (retval != 0)
+    {
+        unregister_chrdev_region (device_number, 1);
+        printk ("couldn't add the Hello module as a character module !!");
+        return -1;
+    }
+    //-----------------------------------------------------------------------
+
 
     for (i = 0; i < cnt; i++)
         printk ("Hello kernel !!\n");
