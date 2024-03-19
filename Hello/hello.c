@@ -126,6 +126,7 @@ static void __exit driver_hello_exit (void)
     //distroy device driver Number automatically function
     //-----------------------------------------------------------------------
     unregister_chrdev_region (device_number, 1);
+    cdev_del (&strut_characterDevice);
     //-----------------------------------------------------------------------
 
     int i = 0;
