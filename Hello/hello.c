@@ -41,6 +41,10 @@ struct file_operations file_operations =
 //add it as character device
 struct cdev strut_characterDevice;
 
+//to create file in the user space
+struct device* pointer_struct_device;
+struct class* pointer_struct_class;
+
 //module informations
 //-----------------------------------------------------------------------
 MODULE_LICENSE("GPL");
@@ -96,38 +100,90 @@ static int __init driver_hello_init (void)
     }
     else
     {
-        printk ("could not create a number for the device !!");
+        printk ("could not create a number for the device !!\n");
         return -1;
     }
     //-----------------------------------------------------------------------
 
     //2-define driver as character, block or network
     //-----------------------------------------------------------------------
-    //add it as character device
+    //add it as a character device
     cdev_init(&strut_characterDevice, &file_operations);
     retval = cdev_add (&strut_characterDevice, device_number, 1);
     if (retval != 0)
     {
         unregister_chrdev_region (device_number, 1);
-        printk ("couldn't add the Hello module as a character module !!");
+
+        printk ("couldn't add the Hello module as a character module !!\n");
+        
         return -1;
     }
     //-----------------------------------------------------------------------
 
+    //3-create file in the user space (/dev)
+    //to handle this module from workspace
+    //-----------------------------------------------------------------------
+    //create class in /sys/class/ for file attributes 
+    pointer_struct_class = class_create("GIHAD_class");
+    if (pointer_struct_class == NULL)
+    {
+
+        unregister_chrdev_region (device_number, 1);
+        cdev_del (&strut_characterDevice);
+
+        printk ("couldn't create class !!\n");
+
+        return -1;
+    }
+
+    pointer_struct_device = device_create(pointer_struct_class, NULL, device_number, NULL, "GIHAD_file");
+    if (pointer_struct_device == NULL)
+    {
+
+        unregister_chrdev_region (device_number, 1);
+        cdev_del (&strut_characterDevice);
+        class_destroy(pointer_struct_class);
+
+        printk ("couldn't create file !!\n");
+
+        return -1;
+    }
+    //-----------------------------------------------------------------------
 
     for (i = 0; i < cnt; i++)
         printk ("Hello kernel !!\n");
+
+
+    printk ("driver is created :)\n");
 
     return 0;
 }
 
 static void __exit driver_hello_exit (void)
 {
+    /**
+     * cdev_del() - remove a cdev from the system
+     * @p: the cdev structure to be removed
+     *
+     * cdev_del() removes @p from the system, possibly freeing the structure
+     * itself.
+     *
+     * NOTE: This guarantees that cdev device will no longer be able to be
+     * opened, however any cdevs already open will remain and their fops will
+     * still be callable even after cdev_del returns.
+     */
+    cdev_del (&strut_characterDevice);
+
+    //destroy file
+    device_destroy (pointer_struct_class, device_number);
+
     //distroy device driver Number automatically function
     //-----------------------------------------------------------------------
     unregister_chrdev_region (device_number, 1);
-    cdev_del (&strut_characterDevice);
     //-----------------------------------------------------------------------
+
+    //destroy class
+    class_destroy(pointer_struct_class);
 
     int i = 0;
     for (i = 0; i < cnt; i++)
