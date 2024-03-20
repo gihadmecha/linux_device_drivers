@@ -112,11 +112,13 @@ static int __init driver_hello_init (void)
     retval = cdev_add (&strut_characterDevice, device_number, 1);
     if (retval != 0)
     {
-        unregister_chrdev_region (device_number, 1);
+        //unregister_chrdev_region (device_number, 1);
 
         printk ("couldn't add the Hello module as a character module !!\n");
         
-        return -1;
+        //return -1;
+
+        goto CHARACTER_ERROR;
     }
     //-----------------------------------------------------------------------
 
@@ -128,25 +130,29 @@ static int __init driver_hello_init (void)
     if (pointer_struct_class == NULL)
     {
 
-        unregister_chrdev_region (device_number, 1);
-        cdev_del (&strut_characterDevice);
+        //unregister_chrdev_region (device_number, 1);
+        //cdev_del (&strut_characterDevice);
 
         printk ("couldn't create class !!\n");
 
-        return -1;
+        goto CLASS_ERROR;
+
+        //return -1;
     }
 
     pointer_struct_device = device_create(pointer_struct_class, NULL, device_number, NULL, "GIHAD_file");
     if (pointer_struct_device == NULL)
     {
 
-        unregister_chrdev_region (device_number, 1);
-        cdev_del (&strut_characterDevice);
-        class_destroy(pointer_struct_class);
+        //unregister_chrdev_region (device_number, 1);
+        //cdev_del (&strut_characterDevice);
+        //class_destroy(pointer_struct_class);
 
         printk ("couldn't create file !!\n");
 
-        return -1;
+        //return -1;
+
+        goto FILE_ERROR;
     }
     //-----------------------------------------------------------------------
 
@@ -157,6 +163,17 @@ static int __init driver_hello_init (void)
     printk ("driver is created :)\n");
 
     return 0;
+
+    
+
+    FILE_ERROR:
+    class_destroy(pointer_struct_class);
+    CLASS_ERROR:
+    cdev_del (&strut_characterDevice);
+    CHARACTER_ERROR:
+    unregister_chrdev_region (device_number, 1);
+
+    return -1;
 }
 
 static void __exit driver_hello_exit (void)
